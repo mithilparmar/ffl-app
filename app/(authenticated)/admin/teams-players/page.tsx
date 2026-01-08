@@ -47,27 +47,27 @@ export default function PlayersPage() {
     ? players 
     : players.filter(p => p.teamId === selectedTeam);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="text-slate-300">Loading...</div>;
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Players</h1>
+      <h1 className="text-3xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Players</h1>
 
       <div className="space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-gray-700">
-            <strong>Note:</strong> Players are managed via the <code>players.csv</code> file. 
-            Run <code>npx tsx prisma/seed.ts</code> to update the player list.
+        <div className="bg-gradient-to-br from-blue-900/40 to-purple-900/40 border border-blue-500/30 rounded-lg p-4 shadow-lg">
+          <p className="text-sm text-slate-300">
+            <strong className="text-slate-100">Note:</strong> Players are managed via the <code className="bg-slate-700 px-2 py-1 rounded text-blue-300">players.csv</code> file. 
+            Run <code className="bg-slate-700 px-2 py-1 rounded text-blue-300">npx tsx prisma/seed.ts</code> to update the player list.
           </p>
         </div>
 
         {/* Filter by Team */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <label className="block text-sm font-medium mb-2">Filter by Team:</label>
+        <div className="bg-slate-800 border border-slate-700 shadow-xl rounded-lg p-6">
+          <label className="block text-sm font-medium mb-2 text-slate-200">Filter by Team:</label>
           <select
             value={selectedTeam}
             onChange={(e) => setSelectedTeam(e.target.value)}
-            className="w-full md:w-64 px-3 py-2 border rounded-md"
+            className="w-full md:w-64 px-3 py-2 bg-slate-700 border border-slate-600 text-slate-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Teams ({players.length})</option>
             {teams.map((team) => (
@@ -79,19 +79,19 @@ export default function PlayersPage() {
         </div>
 
         {/* Players List */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="bg-slate-800 border border-slate-700 shadow-xl rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 text-slate-100">
             {selectedTeam === 'all' ? `All Players (${filteredPlayers.length})` : `${teams.find(t => t.id === selectedTeam)?.shortCode} Players (${filteredPlayers.length})`}
           </h2>
           <div className="space-y-2 max-h-[600px] overflow-y-auto">
             {filteredPlayers.map((player) => (
               <div
                 key={player.id}
-                className="flex justify-between items-center p-3 bg-gray-50 rounded"
+                className="flex justify-between items-center p-3 bg-slate-700/50 hover:bg-slate-700 rounded transition-colors border border-slate-600/50"
               >
                 <div>
-                  <span className="font-medium">{player.name}</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-slate-100">{player.name}</span>
+                  <span className="ml-2 text-slate-400">
                     {player.position} - {player.team.shortCode}
                   </span>
                 </div>
