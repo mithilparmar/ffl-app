@@ -47,7 +47,14 @@ export default async function SubmitLineupPage({
   }
 
   // Get all players grouped by position
-  const players = await prisma.player.findMany({
+  type PlayerWithTeam = {
+    id: string;
+    name: string;
+    position: 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST';
+    team: { id: string; name: string; shortCode: string };
+  };
+
+  const players: PlayerWithTeam[] = await prisma.player.findMany({
     include: {
       team: true,
     },
@@ -57,14 +64,23 @@ export default async function SubmitLineupPage({
     ],
   });
 
-  const qbs = players.filter((p) => p.position === 'QB');
-  const rbs = players.filter((p) => p.position === 'RB');
-  const wrs = players.filter((p) => p.position === 'WR');
-  const tes = players.filter((p) => p.position === 'TE');
+  const qbs = players.filter((p: PlayerWithTeam) => p.position === 'QB');
+  const rbs = players.filter((p: PlayerWithTeam) => p.position === 'RB');
+  const wrs = players.filter((p: PlayerWithTeam) => p.position === 'WR');
+  const tes = players.filter((p: PlayerWithTeam) => p.position === 'TE');
   const flexPlayers = [...rbs, ...wrs, ...tes];
 
   // Get previously used players for this user
-  const previousLineups = await prisma.lineup.findMany({
+  type PreviousLineup = {
+    qb: PlayerWithTeam;
+    rb: PlayerWithTeam;
+    wr: PlayerWithTeam;
+    te: PlayerWithTeam;
+    flex: PlayerWithTeam;
+    week: { number: number };
+  };
+
+  const previousLineups: PreviousLineup[] = await prisma.lineup.findMany({
     where: {
       userId: session.user.id,
       week: {
@@ -84,10 +100,10 @@ export default async function SubmitLineupPage({
   });
 
   const usedPlayerIds = new Set<string>();
-  const usedPlayers: Array<{ player: any; week: number }> = [];
+  const usedPlayers: Array<{ player: PlayerWithTeam; week: number }> = [];
 
-  previousLineups.forEach((lineup) => {
-    [lineup.qb, lineup.rb, lineup.wr, lineup.te, lineup.flex].forEach((player) => {
+  previousLineups.forEach((lineup: PreviousLineup) => {
+    [lineup.qb, lineup.rb, lineup.wr, lineup.te, lineup.flex].forEach((player: PlayerWithTeam) => {
       if (!usedPlayerIds.has(player.id)) {
         usedPlayerIds.add(player.id);
         usedPlayers.push({ player, week: lineup.week.number });
