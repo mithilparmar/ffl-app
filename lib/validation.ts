@@ -103,7 +103,11 @@ export async function validateTeamConstraints(
     lineupData.flexId,
   ];
 
-  const players = await prisma.player.findMany({
+  type PlayerWithTeam = {
+    teamId: string;
+  };
+
+  const players: PlayerWithTeam[] = await prisma.player.findMany({
     where: {
       id: {
         in: playerIds,
@@ -115,7 +119,7 @@ export async function validateTeamConstraints(
   });
 
   const teamCounts = new Map<string, number>();
-  players.forEach((player) => {
+  players.forEach((player: PlayerWithTeam) => {
     const count = teamCounts.get(player.teamId) || 0;
     teamCounts.set(player.teamId, count + 1);
   });
