@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { isWeekLocked } from '@/lib/week-utils';
 import Link from 'next/link';
+import { DeadlineDisplay } from '@/components/DeadlineDisplay';
 
 export default async function WeeksPage() {
   const session = await auth();
@@ -49,16 +50,9 @@ export default async function WeeksPage() {
                 </h3>
                 <p className="text-sm text-slate-300">{week.label}</p>
                 {week.deadline && (
-                  <p className="text-xs text-slate-400 mt-1">
-                    Deadline: {new Date(week.deadline).toLocaleString('en-US', {
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      timeZoneName: 'short'
-                    })}
-                  </p>
+                  <div className="mt-1">
+                    <DeadlineDisplay deadline={week.deadline} />
+                  </div>
                 )}
               </div>
               <span
