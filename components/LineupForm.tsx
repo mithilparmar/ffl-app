@@ -1,0 +1,176 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+interface Player {
+  id: string;
+  name: string;
+  position: string;
+  team: {
+    id: string;
+    name: string;
+    shortCode: string;
+  };
+}
+
+interface Week {
+  id: string;
+  number: number;
+  label: string;
+}
+
+interface LineupFormProps {
+  week: Week;
+  qbs: Player[];
+  rbs: Player[];
+  wrs: Player[];
+  tes: Player[];
+  flexPlayers: Player[];
+  existingLineup?: {
+    qbId: string;
+    rbId: string;
+    wrId: string;
+    teId: string;
+    flexId: string;
+  } | null;
+  usedPlayerIds: string[];
+}
+
+export default function LineupForm({
+  week,
+  qbs,
+  rbs,
+  wrs,
+  tes,
+  flexPlayers,
+  existingLineup,
+  usedPlayerIds,
+}: LineupFormProps) {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    qbId: existingLineup?.qbId || '',
+    rbId: existingLineup?.rbId || '',
+    wrId: existingLineup?.wrId || '',
+    teId: existingLineup?.teId || '',
+    flexId: existingLineup?.flexId || '',
+  });
+  const [errors, setErrors] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors([]);
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/lineups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          weekNumber: week.number,
+          ...formData,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrors(data.errors || [data.error || 'Failed to submit lineup']);
+      } else {
+        router.push('/dashboard');
+        router.refresh();
+      }
+    } catch (error) {
+      setErrors(['An error occurred. Please try again.']);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderPlayerSelect = (
+    id: string,
+    label: string,
+    value: string,
+    players: Player[]
+  ) => {
+    return (
+      <div>
+        <label htmlFor={id} className="block text-sm font-medium mb-2">
+          {label}
+        </label>
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => setFormData({ ...formData, [id]: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">Select a player</option>
+          {players.map((player) => {
+            const isUsed = usedPlayerIds.includes(player.id);
+            return (
+              <option key={player.id} value={player.id} disabled={isUsed}>
+                {player.name} ({player.team.shortCode})
+                {isUsed ? ' - Already Used' : ''}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-white shadow rounded-lg p-6">
+      {errors.length > 0 && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h4 className="font-semibold text-red-800 mb-2">Validation Errors:</h4>
+          <ul className="list-disc list-inside space-y-1 text-red-700">
+            {errors.map((error, i) => (
+              <li key={i}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {renderPlayerSelect('qbId', 'Quarterback (QB)', formData.qbId, qbs)}
+        {renderPlayerSelect('rbId', 'Running Back (RB)', formData.rbId, rbs)}
+        {renderPlayerSelect('wrId', 'Wide Receiver (WR)', formData.wrId, wrs)}
+        {renderPlayerSelect('teId', 'Tight End (TE)', formData.teId, tes)}
+        {renderPlayerSelect('flexId', 'FLEX (RB/WR/TE)', formData.flexId, flexPlayers)}
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-semibold mb-2">Week {week.number} Rules:</h4>
+          <p className="text-sm text-gray-700">
+            {week.number === 1 || week.number === 2
+              ? 'Max 1 player per NFL team (5 different teams required)'
+              : week.number === 3
+              ? '2-1-1-1 split: One team with 2 players, three teams with 1 player each (4 teams total)'
+              : '3-2 split: Players from exactly 2 teams, with a 3-2 distribution'}
+          </p>
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+          >
+            {loading ? 'Submitting...' : existingLineup ? 'Update Lineup' : 'Submit Lineup'}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
+            className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Position {
+  QB
+  RB
+  WR
+  TE
+  K
+  DST
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  isAdmin      Boolean  @default(false)
+  inviteCode   String?  @unique
+  inviteUsed   Boolean  @default(false)
+  lineups      Lineup[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NflTeam {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  shortCode String   @unique
+  players   Player[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Player {
+  id           String        @id @default(cuid())
+  name         String
+  position     Position
+  teamId       String
+  team         NflTeam       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  qbLineups    Lineup[]      @relation("QBLineup")
+  rbLineups    Lineup[]      @relation("RBLineup")
+  wrLineups    Lineup[]      @relation("WRLineup")
+  teLineups    Lineup[]      @relation("TELineup")
+  flexLineups  Lineup[]      @relation("FlexLineup")
+  playerScores PlayerScore[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([teamId])
+}
+
+model Week {
+  id           String        @id @default(cuid())
+  number       Int           @unique
+  label        String
+  isLocked     Boolean       @default(false)
+  deadline     DateTime?
+  lineups      Lineup[]
+  playerScores PlayerScore[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Lineup {
+  id        String   @id @default(cuid())
+  weekId    String
+  userId    String
+  qbId      String
+  rbId      String
+  wrId      String
+  teId      String
+  flexId    String
+  week      Week     @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qb        Player   @relation("QBLineup", fields: [qbId], references: [id])
+  rb        Player   @relation("RBLineup", fields: [rbId], references: [id])
+  wr        Player   @relation("WRLineup", fields: [wrId], references: [id])
+  te        Player   @relation("TELineup", fields: [teId], references: [id])
+  flex      Player   @relation("FlexLineup", fields: [flexId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([weekId, userId])
+  @@index([userId])
+  @@index([weekId])
+}
+
+model PlayerScore {
+  id        String   @id @default(cuid())
+  weekId    String
+  playerId  String
+  points    Float
+  week      Week     @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([weekId, playerId])
+  @@index([playerId])
+  @@index([weekId])
+}
