@@ -8,10 +8,10 @@ const SLEEPER_API = 'https://api.sleeper.app/v1';
 // Map NFL week numbers to Sleeper week format (playoffs)
 // Sleeper uses week numbers: 18 (Wild Card), 19 (Divisional), 20 (Conference), 21 (Super Bowl)
 const NFL_WEEK_MAP: Record<number, number> = {
-  1: 18, // Wild Card
-  2: 19, // Divisional
-  3: 20, // Conference Championship
-  4: 21, // Super Bowl
+  1: 1, // Wild Card
+  2: 2, // Divisional
+  3: 3, // Conference Championship
+  4: 18, // Super Bowl
 };
 
 interface SleeperStats {
@@ -93,7 +93,7 @@ export async function GET(
     }
 
     // Fetch stats from Sleeper API for the current season (2024 season)
-    const season = '2024'; // Sleeper uses season year
+    const season = '2025'; // Sleeper uses season year
     const statsUrl = `${SLEEPER_API}/stats/nfl/regular/${season}/${sleeperWeek}`;
     
     console.log('Fetching from Sleeper API:', statsUrl);

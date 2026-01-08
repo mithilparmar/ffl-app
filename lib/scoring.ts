@@ -1,5 +1,5 @@
 // Scoring calculation based on NFL stats
-interface PlayerStats {
+export interface PlayerStats {
   // Passing
   pass_yd?: number;
   pass_td?: number;
