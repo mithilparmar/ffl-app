@@ -4,7 +4,10 @@ interface PlayerStats {
   pass_yd?: number;
   pass_td?: number;
   pass_int?: number;
+  pass_ink?: number; // Alternative field for interceptions (incomplete)
+  sack_yds?: number;
   pass_sack?: number;
+  pass_sack_yds?: number;
   pass_td_40p?: number; // 40+ yard passing TDs
   pass_td_50p?: number; // 50+ yard passing TDs
   
@@ -55,6 +58,13 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   
   if (stats.pass_sack) {
     score -= stats.pass_sack * 0.5; // -0.5pts per sack
+  }
+  
+  // Alternative sack yards field
+  if (stats.pass_sack_yds && !stats.pass_sack) {
+    // If we have sack yds but not sack count, estimate (assume ~5.5 yds per sack)
+    const estSacks = Math.round(stats.pass_sack_yds / 5.5);
+    score -= estSacks * 0.5;
   }
   
   // Passing TD distance bonuses

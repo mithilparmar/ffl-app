@@ -101,8 +101,8 @@ export async function GET(
       );
     }
 
-    // Fetch stats from Sleeper API for the current season (2024 season)
-    const season = '2024'; // Sleeper uses season year
+    // Fetch stats from Sleeper API for the current season (2025 season)
+    const season = '2025'; // Sleeper uses season year
     const statsUrl = `${SLEEPER_API}/stats/nfl/regular/${season}/${sleeperWeek}`;
     
     const response = await fetch(statsUrl);
