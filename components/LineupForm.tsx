@@ -98,14 +98,14 @@ export default function LineupForm({
   ) => {
     return (
       <div>
-        <label htmlFor={id} className="block text-sm font-medium mb-2">
+        <label htmlFor={id} className="block text-sm font-medium mb-2 text-slate-300">
           {label}
         </label>
         <select
           id={id}
           value={value}
           onChange={(e) => setFormData({ ...formData, [id]: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           required
         >
           <option value="">Select a player</option>
@@ -124,11 +124,11 @@ export default function LineupForm({
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-slate-800 border border-slate-700 shadow-xl rounded-xl p-6">
       {errors.length > 0 && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h4 className="font-semibold text-red-800 mb-2">Validation Errors:</h4>
-          <ul className="list-disc list-inside space-y-1 text-red-700">
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <h4 className="font-semibold text-red-400 mb-2">Validation Errors:</h4>
+          <ul className="list-disc list-inside space-y-1 text-red-300">
             {errors.map((error, i) => (
               <li key={i}>{error}</li>
             ))}
@@ -143,9 +143,9 @@ export default function LineupForm({
         {renderPlayerSelect('teId', 'Tight End (TE)', formData.teId, tes)}
         {renderPlayerSelect('flexId', 'FLEX (RB/WR/TE)', formData.flexId, flexPlayers)}
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold mb-2">Week {week.number} Rules:</h4>
-          <p className="text-sm text-gray-700">
+        <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 border border-blue-600/50 p-4 rounded-xl backdrop-blur-sm">
+          <h4 className="font-semibold mb-2 text-blue-400">Week {week.number} Rules:</h4>
+          <p className="text-sm text-slate-300">
             {week.number === 1 || week.number === 2
               ? 'Max 1 player per NFL team (5 different teams required)'
               : week.number === 3
@@ -158,14 +158,14 @@ export default function LineupForm({
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed font-medium transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-500/20"
           >
             {loading ? 'Submitting...' : existingLineup ? 'Update Lineup' : 'Submit Lineup'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="px-6 py-3 border border-slate-600 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition-all"
           >
             Cancel
           </button>

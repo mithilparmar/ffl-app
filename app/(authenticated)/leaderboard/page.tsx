@@ -103,48 +103,48 @@ export default async function LeaderboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Leaderboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Leaderboard</h1>
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {userScores.map((userScore: UserScore, index: number) => (
           <div
             key={userScore.userId}
-            className={`bg-white shadow rounded-lg p-4 ${
+            className={`bg-slate-800 border shadow-xl rounded-xl p-4 ${
               userScore.userId === session.user.id
-                ? 'ring-2 ring-blue-500'
+                ? 'ring-2 ring-blue-500 border-blue-600 shadow-blue-500/30'
                 : index === 0
-                ? 'ring-2 ring-yellow-500'
-                : ''
+                ? 'ring-2 ring-yellow-500 border-yellow-600 shadow-yellow-500/30'
+                : 'border-slate-700'
             }`}
           >
             <div className="flex justify-between items-start mb-3">
               <div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-slate-400">
                   {index === 0 && userScore.total > 0 && (
                     <span className="mr-2">🏆</span>
                   )}
                   Rank #{index + 1}
                 </div>
-                <div className="font-semibold text-lg">
+                <div className="font-semibold text-lg text-slate-100">
                   {userScore.name}
                   {userScore.userId === session.user.id && (
-                    <span className="ml-2 text-blue-600 text-xs">(You)</span>
+                    <span className="ml-2 text-blue-400 text-xs">(You)</span>
                   )}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-gray-600">Total</div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-xs text-slate-400">Total</div>
+                <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                   {userScore.total.toFixed(2)}
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-2 pt-3 border-t">
+            <div className="grid grid-cols-4 gap-2 pt-3 border-t border-slate-700">
               {userScore.weekScores.map((score: number, weekIndex: number) => (
                 <div key={weekIndex} className="text-center">
-                  <div className="text-xs text-gray-600">W{weekIndex + 1}</div>
-                  <div className="text-sm font-semibold">
+                  <div className="text-xs text-slate-400">W{weekIndex + 1}</div>
+                  <div className="text-sm font-semibold text-slate-200">
                     {score > 0 ? score.toFixed(1) : '-'}
                   </div>
                 </div>
@@ -155,64 +155,66 @@ export default async function LeaderboardPage() {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block bg-white shadow rounded-lg overflow-hidden">
+      <div className="hidden md:block bg-slate-800 border border-slate-700 shadow-xl rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-slate-700">
+            <thead className="bg-slate-900/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Rank
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Manager
                 </th>
                 {weeks.map((week: WeekRecord) => (
                   <th
                     key={week.id}
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-slate-300 uppercase tracking-wider"
                   >
                     Week {week.number}
                   </th>
                 ))}
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-blue-50">
+                <th className="px-6 py-3 text-center text-xs font-medium text-slate-300 uppercase tracking-wider bg-gradient-to-r from-blue-900/50 to-purple-900/50">
                   Total
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-slate-800 divide-y divide-slate-700">
               {userScores.map((userScore: UserScore, index: number) => (
                 <tr
                   key={userScore.userId}
                   className={
                     userScore.userId === session.user.id
-                      ? 'bg-blue-50'
+                      ? 'bg-blue-900/30'
                       : index === 0
-                      ? 'bg-yellow-50'
+                      ? 'bg-yellow-900/20'
                       : ''
                   }
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-200">
                     {index === 0 && userScore.total > 0 && (
                       <span className="mr-2">🏆</span>
                     )}
                     #{index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-100">
                     {userScore.name}
                     {userScore.userId === session.user.id && (
-                      <span className="ml-2 text-blue-600 text-xs">(You)</span>
+                      <span className="ml-2 text-blue-400 text-xs">(You)</span>
                     )}
                   </td>
                   {userScore.weekScores.map((score: number, weekIndex: number) => (
                     <td
                       key={weekIndex}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900"
+                      className="px-6 py-4 whitespace-nowrap text-sm text-center text-slate-200"
                     >
                       {score > 0 ? score.toFixed(2) : '-'}
                     </td>
                   ))}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-center text-blue-600 bg-blue-50">
-                    {userScore.total.toFixed(2)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-center bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+                    <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                      {userScore.total.toFixed(2)}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -222,13 +224,13 @@ export default async function LeaderboardPage() {
       </div>
 
       {userScores.every((u) => u.total === 0) && (
-        <div className="mt-4 bg-gray-50 rounded-lg p-6 text-center text-gray-600">
+        <div className="mt-4 bg-slate-800 border border-slate-700 rounded-xl p-6 text-center text-slate-400">
           <p>No scores have been entered yet. Scores will appear once the admin enters player scores.</p>
         </div>
       )}
 
       <div className="mt-8">
-        <a href="/dashboard" className="text-blue-600 hover:underline">
+        <a href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
           ← Back to Dashboard
         </a>
       </div>

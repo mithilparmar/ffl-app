@@ -29,16 +29,16 @@ export default async function WeekLineupsPage({
   if (!locked) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-2">
+        <div className="bg-gradient-to-br from-yellow-900/30 to-orange-900/30 border border-yellow-600/50 rounded-xl p-6 backdrop-blur-sm">
+          <h2 className="text-xl font-semibold mb-2 text-yellow-400">
             Week {week.number} Lineups Not Yet Visible
           </h2>
-          <p className="text-gray-700 mb-4">
+          <p className="text-slate-300 mb-4">
             Lineups will be visible after the deadline passes or the week is locked by an admin.
           </p>
           <a
             href={`/weeks/${week.number}/submit`}
-            className="text-blue-600 hover:underline"
+            className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
           >
             ← Back to lineup submission
           </a>
@@ -132,38 +132,38 @@ export default async function WeekLineupsPage({
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">
+      <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
         Week {week.number} Lineups
       </h1>
-      <p className="text-gray-600 mb-8">{week.label}</p>
+      <p className="text-slate-400 mb-8">{week.label}</p>
 
       {lineupsWithScores.length === 0 ? (
-        <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-600">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 text-center text-slate-400">
           No lineups submitted for this week yet.
         </div>
       ) : (
         <div className="space-y-6">
           {lineupsWithScores.map((lineup: LineupWithPlayers & { scores: { qb: number; rb: number; wr: number; te: number; flex: number; total: number } }, index: number) => (
-            <div key={lineup.id} className="bg-white shadow rounded-lg p-6">
+            <div key={lineup.id} className="bg-slate-800 border border-slate-700 shadow-xl rounded-xl p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold">
+                  <h3 className="text-xl font-semibold text-slate-100">
                     {lineup.user.name}
                     {lineup.userId === session.user.id && (
-                      <span className="ml-2 text-sm text-blue-600">(You)</span>
+                      <span className="ml-2 text-sm text-blue-400">(You)</span>
                     )}
                   </h3>
                   {index === 0 && lineup.scores.total > 0 && (
-                    <span className="inline-block mt-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                    <span className="inline-block mt-1 bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs px-2 py-1 rounded-lg">
                       🏆 Top Score
                     </span>
                   )}
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     {lineup.scores.total.toFixed(2)}
                   </div>
-                  <div className="text-sm text-gray-600">Total Points</div>
+                  <div className="text-sm text-slate-400">Total Points</div>
                 </div>
               </div>
 
@@ -175,13 +175,13 @@ export default async function WeekLineupsPage({
                   { label: 'TE', player: lineup.te, score: lineup.scores.te },
                   { label: 'FLEX', player: lineup.flex, score: lineup.scores.flex },
                 ].map(({ label, player, score }: { label: string; player: LineupWithPlayers['qb']; score: number }) => (
-                  <div key={label} className="bg-gray-50 rounded p-3">
-                    <div className="text-xs font-semibold text-gray-600 mb-1">
+                  <div key={label} className="bg-slate-900/50 border border-slate-700 rounded-lg p-3">
+                    <div className="text-xs font-semibold text-slate-400 mb-1">
                       {label}
                     </div>
-                    <div className="font-medium">{player.name}</div>
-                    <div className="text-sm text-gray-600">{player.team.shortCode}</div>
-                    <div className="mt-2 text-lg font-semibold text-blue-600">
+                    <div className="font-medium text-slate-100">{player.name}</div>
+                    <div className="text-sm text-slate-400">{player.team.shortCode}</div>
+                    <div className="mt-2 text-lg font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                       {score.toFixed(2)}
                     </div>
                   </div>
@@ -195,7 +195,7 @@ export default async function WeekLineupsPage({
       <div className="mt-8">
         <a
           href="/dashboard"
-          className="text-blue-600 hover:underline"
+          className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
         >
           ← Back to Dashboard
         </a>

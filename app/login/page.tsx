@@ -37,20 +37,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 sm:p-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">NFL Playoff Fantasy</h1>
-        <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4 sm:px-6">
+      <div className="max-w-md w-full bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-6 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">NFL Playoff Fantasy</h1>
+          <p className="text-slate-400 mt-2 text-sm">Manage your fantasy playoff lineups</p>
+        </div>
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-slate-100">Login</h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4" suppressHydrationWarning>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-slate-300">
               Email
             </label>
             <input
@@ -59,13 +62,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="your@email.com"
               suppressHydrationWarning
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label htmlFor="password" className="block text-sm font-medium mb-2 text-slate-300">
               Password
             </label>
             <input
@@ -74,7 +78,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="••••••••"
               suppressHydrationWarning
             />
           </div>
@@ -82,16 +87,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">Don't have an account?</p>
-          <a href="/signup" className="text-blue-600 hover:text-blue-800 font-semibold mt-2 inline-block">
-            Sign up with invite code
+          <p className="text-slate-400">Don't have an account?</p>
+          <a href="/signup" className="text-blue-400 hover:text-blue-300 font-semibold mt-2 inline-block transition-colors">
+            Sign up with invite code →
           </a>
         </div>
       </div>

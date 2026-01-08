@@ -78,16 +78,16 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Create Account</h1>
-        <p className="text-center text-gray-600 mb-6">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-8">
+        <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Create Account</h1>
+        <p className="text-center text-slate-400 mb-6">
           Join the NFL Playoff Fantasy League
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Invite Code
             </label>
             <input
@@ -96,13 +96,13 @@ export default function SignUpPage() {
               value={formData.inviteCode}
               onChange={handleChange}
               placeholder="Enter your invite code"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Full Name
             </label>
             <input
@@ -111,13 +111,13 @@ export default function SignUpPage() {
               value={formData.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Email
             </label>
             <input
@@ -126,13 +126,13 @@ export default function SignUpPage() {
               value={formData.email}
               onChange={handleChange}
               placeholder="your@email.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Password
             </label>
             <input
@@ -141,13 +141,13 @@ export default function SignUpPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Min 6 characters"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Confirm Password
             </label>
             <input
@@ -156,13 +156,13 @@ export default function SignUpPage() {
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="Confirm password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               disabled={loading}
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -170,15 +170,15 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
+            className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:from-slate-600 disabled:to-slate-600 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-slate-400 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
             Log in here
           </Link>
         </p>
