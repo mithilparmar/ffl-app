@@ -51,15 +51,11 @@ export async function GET(
         lineups: {
           include: {
             user: true,
-            lineup: {
-              include: {
-                qb: { include: { team: true } },
-                rb: { include: { team: true } },
-                wr: { include: { team: true } },
-                te: { include: { team: true } },
-                flex: { include: { team: true } },
-              },
-            },
+            qb: { include: { team: true } },
+            rb: { include: { team: true } },
+            wr: { include: { team: true } },
+            te: { include: { team: true } },
+            flex: { include: { team: true } },
           },
         },
       },
@@ -75,13 +71,11 @@ export async function GET(
     // Get all unique players from lineups
     const playerIds = new Set<string>();
     week.lineups.forEach((lineup) => {
-      if (lineup.lineup) {
-        playerIds.add(lineup.lineup.qbId);
-        playerIds.add(lineup.lineup.rbId);
-        playerIds.add(lineup.lineup.wrId);
-        playerIds.add(lineup.lineup.teId);
-        playerIds.add(lineup.lineup.flexId);
-      }
+      playerIds.add(lineup.qbId);
+      playerIds.add(lineup.rbId);
+      playerIds.add(lineup.wrId);
+      playerIds.add(lineup.teId);
+      playerIds.add(lineup.flexId);
     });
 
     // Fetch players with their Sleeper IDs
