@@ -25,11 +25,19 @@ export default async function WeeksPage() {
     }
   }
 
-  const weeksWithStatus = weeks.map((week) => ({
-    ...week,
-    locked: isWeekLocked(week),
-    isCurrent: week.number === currentWeekNumber,
-  }));
+  const weeksWithStatus = weeks.map((week) => {
+    const isLocked = isWeekLocked(week);
+    const isCurrent = week.number === currentWeekNumber;
+    const isFutureWeek = !isLocked && !isCurrent;
+
+    return {
+      ...week,
+      locked: isLocked,
+      isCurrent,
+      isFutureWeek,
+      displayAsLocked: isLocked || isFutureWeek, // Show as locked if truly locked or if it's a future week
+    };
+  });
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -57,12 +65,12 @@ export default async function WeeksPage() {
               </div>
               <span
                 className={`px-3 py-1 rounded-lg text-sm font-semibold whitespace-nowrap shadow-lg ${
-                  week.locked
+                  week.displayAsLocked
                     ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-red-500/30'
                     : 'bg-gradient-to-r from-green-600 to-green-500 text-white shadow-green-500/30'
                 }`}
               >
-                {week.locked ? 'Locked' : 'Open'}
+                {week.displayAsLocked ? 'Locked' : 'Open'}
               </span>
             </div>
 
@@ -76,9 +84,12 @@ export default async function WeeksPage() {
                 </Link>
               )}
               {!week.locked && !week.isCurrent && (
-                <div className="px-4 py-2 bg-slate-700/50 text-slate-400 rounded-lg font-medium text-sm cursor-not-allowed">
-                  Locked (Previous weeks must be completed first)
-                </div>
+                <button
+                  disabled
+                  className="px-4 py-2 bg-slate-700/50 text-slate-500 rounded-lg font-medium text-sm cursor-not-allowed opacity-50"
+                >
+                  Submit Lineup
+                </button>
               )}
               {week.locked && (
                 <Link
