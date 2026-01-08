@@ -15,9 +15,19 @@ export default async function WeeksPage() {
     orderBy: { number: 'asc' },
   });
 
+  // Find the first unlocked week (current week)
+  let currentWeekNumber: number | null = null;
+  for (const week of weeks) {
+    if (!isWeekLocked(week)) {
+      currentWeekNumber = week.number;
+      break;
+    }
+  }
+
   const weeksWithStatus = weeks.map((week) => ({
     ...week,
     locked: isWeekLocked(week),
+    isCurrent: week.number === currentWeekNumber,
   }));
 
   return (
@@ -63,13 +73,18 @@ export default async function WeeksPage() {
             </div>
 
             <div className="mt-4 flex gap-2">
-              {!week.locked && (
+              {!week.locked && week.isCurrent && (
                 <Link
                   href={`/weeks/${week.number}/submit`}
                   className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all shadow-lg shadow-blue-500/20 font-medium text-sm"
                 >
                   Submit Lineup
                 </Link>
+              )}
+              {!week.locked && !week.isCurrent && (
+                <div className="px-4 py-2 bg-slate-700/50 text-slate-400 rounded-lg font-medium text-sm cursor-not-allowed">
+                  Locked (Previous weeks must be completed first)
+                </div>
               )}
               {week.locked && (
                 <Link

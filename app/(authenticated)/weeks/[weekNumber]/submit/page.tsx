@@ -46,6 +46,34 @@ export default async function SubmitLineupPage({
     );
   }
 
+  // Check if there are previous unlocked weeks
+  const previousWeeks = await prisma.week.findMany({
+    where: {
+      number: { lt: weekNum },
+    },
+  });
+
+  const hasPreviousUnlockedWeek = previousWeeks.some((w) => !isWeekLocked(w));
+
+  if (hasPreviousUnlockedWeek) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gradient-to-br from-red-900/30 to-orange-900/30 border border-red-600/50 rounded-xl p-6 backdrop-blur-sm">
+          <h2 className="text-xl font-semibold mb-2 text-red-400">Week {week.number} Not Available</h2>
+          <p className="text-slate-300 mb-4">
+            You must complete previous weeks before submitting a lineup for this week.
+          </p>
+          <a
+            href="/weeks"
+            className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+          >
+            ← View all weeks
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   // Get all players grouped by position
   type PlayerWithTeam = {
     id: string;
