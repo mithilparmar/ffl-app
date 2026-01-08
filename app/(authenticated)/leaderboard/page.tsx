@@ -54,7 +54,7 @@ export default async function LeaderboardPage() {
   }
 
   const userScores: UserScore[] = users.map((user: { id: string; name: string }) => {
-    const weekScores = weeks.map((week) => {
+    const weekScores = weeks.map((week: { id: string }) => {
       const lineup = lineups.find(
         (l) => l.userId === user.id && l.weekId === week.id
       );
