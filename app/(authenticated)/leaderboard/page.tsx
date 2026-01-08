@@ -44,6 +44,11 @@ export default async function LeaderboardPage() {
     flexId: string;
   };
 
+  type WeekRecord = {
+    id: string;
+    number: number;
+  };
+
   // Get all scores
   const scores = await prisma.playerScore.findMany();
   const scoreMap = new Map<string, Map<string, number>>();
@@ -64,7 +69,7 @@ export default async function LeaderboardPage() {
   }
 
   const userScores: UserScore[] = users.map((user: { id: string; name: string }) => {
-    const weekScores = weeks.map((week: { id: string }) => {
+    const weekScores = weeks.map((week: WeekRecord) => {
       const lineup = lineups.find(
         (l: LineupRecord) => l.userId === user.id && l.weekId === week.id
       );
@@ -102,7 +107,7 @@ export default async function LeaderboardPage() {
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
-        {userScores.map((userScore, index) => (
+        {userScores.map((userScore: UserScore, index: number) => (
           <div
             key={userScore.userId}
             className={`bg-white shadow rounded-lg p-4 ${
@@ -136,7 +141,7 @@ export default async function LeaderboardPage() {
               </div>
             </div>
             <div className="grid grid-cols-4 gap-2 pt-3 border-t">
-              {userScore.weekScores.map((score, weekIndex) => (
+              {userScore.weekScores.map((score: number, weekIndex: number) => (
                 <div key={weekIndex} className="text-center">
                   <div className="text-xs text-gray-600">W{weekIndex + 1}</div>
                   <div className="text-sm font-semibold">
@@ -161,7 +166,7 @@ export default async function LeaderboardPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Manager
                 </th>
-                {weeks.map((week) => (
+                {weeks.map((week: WeekRecord) => (
                   <th
                     key={week.id}
                     className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -175,7 +180,7 @@ export default async function LeaderboardPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {userScores.map((userScore, index) => (
+              {userScores.map((userScore: UserScore, index: number) => (
                 <tr
                   key={userScore.userId}
                   className={
@@ -198,7 +203,7 @@ export default async function LeaderboardPage() {
                       <span className="ml-2 text-blue-600 text-xs">(You)</span>
                     )}
                   </td>
-                  {userScore.weekScores.map((score, weekIndex) => (
+                  {userScore.weekScores.map((score: number, weekIndex: number) => (
                     <td
                       key={weekIndex}
                       className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-900"
