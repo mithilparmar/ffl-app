@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentWeek, isWeekLocked } from '@/lib/week-utils';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { DeadlineDisplay } from '@/components/DeadlineDisplay';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -46,16 +47,7 @@ export default async function DashboardPage() {
               <h3 className="text-base sm:text-lg font-semibold text-slate-100">Week {currentWeek.number}</h3>
               <p className="text-sm sm:text-base text-slate-300">{currentWeek.label}</p>
               {currentWeek.deadline && (
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                  Deadline: {new Date(currentWeek.deadline).toLocaleString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    timeZoneName: 'short'
-                  })}
-                </p>
+                <DeadlineDisplay deadline={currentWeek.deadline} />
               )}
             </div>
             <span
