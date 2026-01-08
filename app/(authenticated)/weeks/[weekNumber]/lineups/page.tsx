@@ -48,7 +48,24 @@ export default async function WeekLineupsPage({
   }
 
   // Get all lineups for this week with player scores
-  const lineups = await prisma.lineup.findMany({
+  type LineupWithPlayers = {
+    id: string;
+    userId: string;
+    weekId: string;
+    qbId: string;
+    rbId: string;
+    wrId: string;
+    teId: string;
+    flexId: string;
+    user: { id: string; name: string };
+    qb: { name: string; team: { shortCode: string } };
+    rb: { name: string; team: { shortCode: string } };
+    wr: { name: string; team: { shortCode: string } };
+    te: { name: string; team: { shortCode: string } };
+    flex: { name: string; team: { shortCode: string } };
+  };
+
+  const lineups: LineupWithPlayers[] = await prisma.lineup.findMany({
     where: {
       weekId: week.id,
     },
@@ -64,7 +81,7 @@ export default async function WeekLineupsPage({
 
   // Get scores for all players in these lineups
   const playerIds = new Set<string>();
-  lineups.forEach((lineup) => {
+  lineups.forEach((lineup: LineupWithPlayers) => {
     playerIds.add(lineup.qbId);
     playerIds.add(lineup.rbId);
     playerIds.add(lineup.wrId);
@@ -84,7 +101,7 @@ export default async function WeekLineupsPage({
   const scoreMap = new Map(scores.map((s) => [s.playerId, s.points]));
 
   // Calculate lineup scores
-  const lineupsWithScores = lineups.map((lineup) => {
+  const lineupsWithScores = lineups.map((lineup: LineupWithPlayers) => {
     const qbScore = scoreMap.get(lineup.qbId) || 0;
     const rbScore = scoreMap.get(lineup.rbId) || 0;
     const wrScore = scoreMap.get(lineup.wrId) || 0;
@@ -121,7 +138,7 @@ export default async function WeekLineupsPage({
         </div>
       ) : (
         <div className="space-y-6">
-          {lineupsWithScores.map((lineup, index) => (
+          {lineupsWithScores.map((lineup: LineupWithPlayers & { scores: { qb: number; rb: number; wr: number; te: number; flex: number; total: number } }, index: number) => (
             <div key={lineup.id} className="bg-white shadow rounded-lg p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -152,7 +169,7 @@ export default async function WeekLineupsPage({
                   { label: 'WR', player: lineup.wr, score: lineup.scores.wr },
                   { label: 'TE', player: lineup.te, score: lineup.scores.te },
                   { label: 'FLEX', player: lineup.flex, score: lineup.scores.flex },
-                ].map(({ label, player, score }) => (
+                ].map(({ label, player, score }: { label: string; player: LineupWithPlayers['qb']; score: number }) => (
                   <div key={label} className="bg-gray-50 rounded p-3">
                     <div className="text-xs font-semibold text-gray-600 mb-1">
                       {label}
