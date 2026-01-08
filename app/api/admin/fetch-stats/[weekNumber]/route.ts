@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { calculatePlayerScore } from '@/lib/scoring';
-import { fetchAllPlayersStatsESPN } from '@/lib/espn-api';
 
 // Sleeper API base URL
 const SLEEPER_API = 'https://api.sleeper.app/v1';
@@ -93,48 +92,49 @@ export async function GET(
       where: { id: { in: Array.from(playerIds) } },
     });
 
-    // Map NFL week numbers to playoff weeks
-    const weekNum = parseInt(weekNumber);
-    if (weekNum < 1 || weekNum > 4) {
+    // Map Sleeper week
+    const sleeperWeek = NFL_WEEK_MAP[parseInt(weekNumber)];
+    if (!sleeperWeek) {
       return NextResponse.json(
-        { error: 'Invalid week number. Must be 1-4 (playoff weeks)' },
+        { error: 'Invalid week number' },
         { status: 400 }
       );
     }
 
-    // Fetch stats from ESPN API
-    const playerList = players.map((p) => ({
-      name: p.name,
-      teamCode: p.team.shortCode,
-      id: p.id,
-    }));
+    // Fetch stats from Sleeper API for the current season (2024 season)
+    const season = '2024'; // Sleeper uses season year
+    const statsUrl = `${SLEEPER_API}/stats/nfl/regular/${season}/${sleeperWeek}`;
+    
+    const response = await fetch(statsUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch stats from Sleeper API');
+    }
 
-    console.log(`Fetching ESPN stats for ${playerList.length} players...`);
-    const statsByPlayerId = await fetchAllPlayersStatsESPN(weekNum, playerList);
+    const allStats: Record<string, SleeperStats> = await response.json();
 
     // Calculate scores for each player
-    const calculatedScores = players.map((player) => {
-      const playerStats = statsByPlayerId[player.id] || {};
-      const score = calculatePlayerScore(playerStats);
+    const calculatedScores = players
+      .filter((player) => player.sleeperId) // Only players with Sleeper ID
+      .map((player) => {
+        const playerStats = allStats[player.sleeperId!] || {};
+        const score = calculatePlayerScore(playerStats);
 
-      return {
-        playerId: player.id,
-        playerName: player.name,
-        points: score,
-        stats: playerStats,
-      };
-    });
-
-    const fetchedCount = Object.keys(statsByPlayerId).length;
-    const notFoundCount = players.length - fetchedCount;
+        return {
+          playerId: player.id,
+          playerName: player.name,
+          sleeperId: player.sleeperId,
+          points: score,
+          stats: playerStats,
+        };
+      });
 
     return NextResponse.json({
-      week: weekNum,
-      source: 'ESPN API',
+      week: parseInt(weekNumber),
+      sleeperWeek,
       scores: calculatedScores,
-      fetchedCount,
-      notFoundCount,
-      message: `Fetched stats for ${fetchedCount} players${notFoundCount > 0 ? `, ${notFoundCount} not found` : ''}`,
+      unmappedPlayers: players
+        .filter((player) => !player.sleeperId)
+        .map((p) => ({ id: p.id, name: p.name })),
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
