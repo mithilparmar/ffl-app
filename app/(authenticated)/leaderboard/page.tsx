@@ -83,7 +83,7 @@ export default async function LeaderboardPage() {
       return qbScore + rbScore + wrScore + teScore + flexScore;
     });
 
-    const total = weekScores.reduce((sum, score) => sum + score, 0);
+    const total = weekScores.reduce((sum: number, score: number) => sum + score, 0);
 
     return {
       userId: user.id,
