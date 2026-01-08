@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SearchablePlayerSelect from './SearchablePlayerSelect';
 
 interface Player {
   id: string;
@@ -97,29 +98,16 @@ export default function LineupForm({
     players: Player[]
   ) => {
     return (
-      <div>
-        <label htmlFor={id} className="block text-sm font-medium mb-2 text-slate-300">
-          {label}
-        </label>
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => setFormData({ ...formData, [id]: e.target.value })}
-          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          required
-        >
-          <option value="">Select a player</option>
-          {players.map((player) => {
-            const isUsed = usedPlayerIds.includes(player.id);
-            return (
-              <option key={player.id} value={player.id} disabled={isUsed}>
-                {player.name} ({player.team.shortCode})
-                {isUsed ? ' - Already Used' : ''}
-              </option>
-            );
-          })}
-        </select>
-      </div>
+      <SearchablePlayerSelect
+        id={id}
+        label={label}
+        value={value}
+        players={players}
+        usedPlayerIds={usedPlayerIds}
+        onChange={(newValue) =>
+          setFormData({ ...formData, [id]: newValue })
+        }
+      />
     );
   };
 
