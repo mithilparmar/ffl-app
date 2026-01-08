@@ -1,99 +1,137 @@
 // Scoring calculation based on NFL stats
-interface PlayerStats {
-  // Passing
+// Supports both Sleeper API and ESPN API stat formats
+
+export interface PlayerStats {
+  // Passing (Sleeper format)
   pass_yd?: number;
   pass_td?: number;
   pass_int?: number;
-  pass_ink?: number; // Alternative field for interceptions (incomplete)
-  sack_yds?: number;
   pass_sack?: number;
   pass_sack_yds?: number;
-  pass_td_40p?: number; // 40+ yard passing TDs
-  pass_td_50p?: number; // 50+ yard passing TDs
   
-  // Rushing
+  // Passing (ESPN format)
+  passingYards?: number;
+  passingTouchdowns?: number;
+  interceptions?: number;
+  sacks?: number;
+  
+  // Rushing (Sleeper format)
   rush_yd?: number;
   rush_td?: number;
-  rush_td_40p?: number; // 40+ yard rushing TDs
-  rush_td_50p?: number; // 50+ yard rushing TDs
+  rush_td_40p?: number;
+  rush_td_50p?: number;
   
-  // Receiving
+  // Rushing (ESPN format)
+  rushingYards?: number;
+  rushingTouchdowns?: number;
+  
+  // Receiving (Sleeper format)
   rec_yd?: number;
   rec_td?: number;
-  rec?: number; // Receptions
-  rec_td_40p?: number; // 40+ yard receiving TDs
-  rec_td_50p?: number; // 50+ yard receiving TDs
+  rec?: number;
+  rec_td_40p?: number;
+  rec_td_50p?: number;
   
-  // Misc
-  fum?: number; // Fumbles
-  fum_lost?: number; // Fumbles lost
-  fum_rec_td?: number; // Fumble recovery TDs
-  pass_2pt?: number; // Passing 2pt conversions
-  rec_2pt?: number; // Receiving 2pt conversions
-  rush_2pt?: number; // Rushing 2pt conversions
+  // Receiving (ESPN format)
+  receivingYards?: number;
+  receivingTouchdowns?: number;
+  receivingReceptions?: number;
+  
+  // Misc (Sleeper format)
+  fum?: number;
+  fum_lost?: number;
+  fum_rec_td?: number;
+  pass_2pt?: number;
+  rec_2pt?: number;
+  rush_2pt?: number;
+  
+  // Misc (ESPN format)
+  fumblesRecovered?: number;
+  fumblesLost?: number;
+  defensiveTouchdowns?: number;
 }
 
 export function calculatePlayerScore(stats: PlayerStats): number {
   let score = 0;
 
+  // Helper to handle both API formats
+  const getPassYards = () => stats.pass_yd ?? stats.passingYards ?? 0;
+  const getPassTD = () => stats.pass_td ?? stats.passingTouchdowns ?? 0;
+  const getPassInt = () => stats.pass_int ?? stats.interceptions ?? 0;
+  const getPassSack = () => {
+    if (stats.pass_sack !== undefined) return stats.pass_sack;
+    if (stats.sacks !== undefined) return stats.sacks;
+    if (stats.pass_sack_yds) return Math.round(stats.pass_sack_yds / 5.5);
+    return 0;
+  };
+  
+  const getRushYards = () => stats.rush_yd ?? stats.rushingYards ?? 0;
+  const getRushTD = () => stats.rush_td ?? stats.rushingTouchdowns ?? 0;
+  
+  const getRecYards = () => stats.rec_yd ?? stats.receivingYards ?? 0;
+  const getRecTD = () => stats.rec_td ?? stats.receivingTouchdowns ?? 0;
+  const getRec = () => stats.rec ?? stats.receivingReceptions ?? 0;
+  
+  const getFum = () => stats.fum ?? 0;
+  const getFumLost = () => stats.fum_lost ?? stats.fumblesLost ?? 0;
+  const getFumRecTD = () => stats.fum_rec_td ?? stats.defensiveTouchdowns ?? 0;
+
   // PASSING
-  if (stats.pass_yd) {
-    score += Math.floor(stats.pass_yd / 25); // 1pt per 25 yards
+  const passYards = getPassYards();
+  if (passYards) {
+    score += Math.floor(passYards / 25); // 1pt per 25 yards
     
     // Passing yardage bonuses
-    if (stats.pass_yd >= 400) {
+    if (passYards >= 400) {
       score += 4;
-    } else if (stats.pass_yd >= 300) {
+    } else if (passYards >= 300) {
       score += 2;
     }
   }
   
-  if (stats.pass_td) {
-    score += stats.pass_td * 4; // 4pts per passing TD
+  const passTD = getPassTD();
+  if (passTD) {
+    score += passTD * 4; // 4pts per passing TD
   }
   
-  if (stats.pass_int) {
-    score -= stats.pass_int * 2; // -2pts per interception
+  const passInt = getPassInt();
+  if (passInt) {
+    score -= passInt * 2; // -2pts per interception
   }
   
-  if (stats.pass_sack) {
-    score -= stats.pass_sack * 0.5; // -0.5pts per sack
+  const passSack = getPassSack();
+  if (passSack) {
+    score -= passSack * 0.5; // -0.5pts per sack
   }
   
-  // Alternative sack yards field
-  if (stats.pass_sack_yds && !stats.pass_sack) {
-    // If we have sack yds but not sack count, estimate (assume ~5.5 yds per sack)
-    const estSacks = Math.round(stats.pass_sack_yds / 5.5);
-    score -= estSacks * 0.5;
-  }
-  
-  // Passing TD distance bonuses
+  // Passing TD distance bonuses (if available)
   if (stats.pass_td_50p) {
     score += stats.pass_td_50p * 2; // 2pt bonus for 50+ yard TD
   }
   if (stats.pass_td_40p) {
-    // 40+ includes 50+, so subtract 50+ to avoid double counting
     const fortyPlus = stats.pass_td_40p - (stats.pass_td_50p || 0);
     score += fortyPlus * 1; // 1pt bonus for 40-49 yard TD
   }
 
   // RUSHING
-  if (stats.rush_yd) {
-    score += Math.floor(stats.rush_yd / 10); // 1pt per 10 yards
+  const rushYards = getRushYards();
+  if (rushYards) {
+    score += Math.floor(rushYards / 10); // 1pt per 10 yards
     
     // Rushing yardage bonuses
-    if (stats.rush_yd >= 200) {
+    if (rushYards >= 200) {
       score += 2;
-    } else if (stats.rush_yd >= 100) {
+    } else if (rushYards >= 100) {
       score += 1;
     }
   }
   
-  if (stats.rush_td) {
-    score += stats.rush_td * 6; // 6pts per rushing TD
+  const rushTD = getRushTD();
+  if (rushTD) {
+    score += rushTD * 6; // 6pts per rushing TD
   }
   
-  // Rushing TD distance bonuses
+  // Rushing TD distance bonuses (if available)
   if (stats.rush_td_50p) {
     score += stats.rush_td_50p * 2; // 2pt bonus for 50+ yard TD
   }
@@ -103,26 +141,29 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   }
 
   // RECEIVING
-  if (stats.rec) {
-    score += stats.rec * 0.5; // 0.5pts per reception
+  const rec = getRec();
+  if (rec) {
+    score += rec * 0.5; // 0.5pts per reception
   }
   
-  if (stats.rec_yd) {
-    score += Math.floor(stats.rec_yd / 10); // 1pt per 10 yards
+  const recYards = getRecYards();
+  if (recYards) {
+    score += Math.floor(recYards / 10); // 1pt per 10 yards
     
     // Receiving yardage bonuses
-    if (stats.rec_yd >= 200) {
+    if (recYards >= 200) {
       score += 2;
-    } else if (stats.rec_yd >= 100) {
+    } else if (recYards >= 100) {
       score += 1;
     }
   }
   
-  if (stats.rec_td) {
-    score += stats.rec_td * 6; // 6pts per receiving TD
+  const recTD = getRecTD();
+  if (recTD) {
+    score += recTD * 6; // 6pts per receiving TD
   }
   
-  // Receiving TD distance bonuses
+  // Receiving TD distance bonuses (if available)
   if (stats.rec_td_50p) {
     score += stats.rec_td_50p * 2; // 2pt bonus for 50+ yard TD
   }
@@ -132,16 +173,19 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   }
 
   // MISC
-  if (stats.fum) {
-    score -= stats.fum; // -1pt per fumble
+  const fum = getFum();
+  if (fum) {
+    score -= fum; // -1pt per fumble
   }
   
-  if (stats.fum_lost) {
-    score -= stats.fum_lost; // -1pt per fumble lost
+  const fumLost = getFumLost();
+  if (fumLost) {
+    score -= fumLost; // -1pt per fumble lost
   }
   
-  if (stats.fum_rec_td) {
-    score += stats.fum_rec_td * 6; // 6pts for fumble recovery TD
+  const fumRecTD = getFumRecTD();
+  if (fumRecTD) {
+    score += fumRecTD * 6; // 6pts for fumble recovery TD
   }
   
   // 2-point conversions

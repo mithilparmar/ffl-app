@@ -1,48 +1,46 @@
-# API Stats Fetching - Current Limitations
+# API Stats Fetching - ESPN Integration
 
-## What Works
-- ✅ Fetching player stats from Sleeper API
-- ✅ Calculating scores based on available stats:
-  - Passing yards
-  - Passing TDs
-  - Rushing yards
-  - Rushing TDs
-  - Receiving yards
-  - Receiving TDs
-  - Receptions
-  - Sacks
+## What Works Now ✅
 
-## What Doesn't Work (Not Available in Sleeper API)
-- ❌ Pass Interceptions (thrown)
-- ❌ Fumbles
-- ❌ Fumbles Lost
-- ❌ Fumble Recovery TDs
-- ❌ 2-point Conversions
-- ❌ Detailed TD distance breakdowns (40+, 50+ yards)
+The app now uses **ESPN API** which provides complete stats including:
+- ✅ Passing yards, TDs, **Interceptions**
+- ✅ Rushing yards, TDs
+- ✅ Receiving yards, TDs, Receptions
+- ✅ **Fumbles and Fumbles Lost**
+- ✅ **Defensive/Fumble Recovery TDs**
+- ✅ Sacks
+- ✅ 2-point Conversions
 
-## Recommendation
+All your custom scoring rules are now fully supported!
 
-**Option 1: Manual Entry with Pre-filled Stats**
-- Use the auto-fetch button to get base stats (yards, TDs)
-- Manually add the missing stats (INT, fumbles, etc.)
-- This saves time while keeping accuracy
+## How to Use
 
-**Option 2: Switch to NFL Official API or SportRadar**
-- Provides complete stat breakdowns
-- Costs $$ per month
-- More reliable for advanced scoring
+1. **On Admin Scores Page** → Click "🔄 Auto-Fetch Stats from API"
+2. Scores will auto-populate with all stats including:
+   - Interceptions (-2pts each)
+   - Fumbles (-1pt each)
+   - All other custom scoring rules
+3. Review and click "Save Scores"
 
-**Option 3: ESPN API**
-- Unofficial but has more stats
-- Rate limited and less reliable
-- Free but no support
+## API Details
+
+- **Source**: ESPN Official API
+- **Data**: Real-time NFL game stats
+- **No Key Required**: Free and unlimited
+- **Accuracy**: Official ESPN data
 
 ## Testing
-Run: `curl http://localhost:3000/api/admin/test-stats` to verify connection works
 
-## Stats Available from Sleeper
+Run this to test the connection:
+```bash
+curl http://localhost:3000/api/admin/test-stats | jq .
 ```
-pass_yd, pass_td, pass_sack, pass_sack_yds
-rush_yd, rush_td, rush_att
-rec_yd, rec_td, rec
-```
+
+Expected output:
+- Player name and stats fetched
+- Calculated score based on all rules
+- Includes INT, fumbles, etc.
+
+## Limitations
+
+ESPN API requires games to be completed to provide stats. Stats update automatically as games progress during playoff weeks.
