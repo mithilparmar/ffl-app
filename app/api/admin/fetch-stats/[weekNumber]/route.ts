@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { calculatePlayerScore } from '@/lib/scoring';
 
@@ -45,11 +44,6 @@ export async function GET(
   { params }: { params: Promise<{ weekNumber: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user.isAdmin) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { weekNumber } = await params;
     const week = await prisma.week.findUnique({
       where: { number: parseInt(weekNumber) },
