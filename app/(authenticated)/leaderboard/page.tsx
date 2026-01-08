@@ -34,6 +34,16 @@ export default async function LeaderboardPage() {
     },
   });
 
+  type LineupRecord = {
+    userId: string;
+    weekId: string;
+    qbId: string;
+    rbId: string;
+    wrId: string;
+    teId: string;
+    flexId: string;
+  };
+
   // Get all scores
   const scores = await prisma.playerScore.findMany();
   const scoreMap = new Map<string, Map<string, number>>();
@@ -56,7 +66,7 @@ export default async function LeaderboardPage() {
   const userScores: UserScore[] = users.map((user: { id: string; name: string }) => {
     const weekScores = weeks.map((week: { id: string }) => {
       const lineup = lineups.find(
-        (l) => l.userId === user.id && l.weekId === week.id
+        (l: LineupRecord) => l.userId === user.id && l.weekId === week.id
       );
 
       if (!lineup) return 0;
