@@ -38,7 +38,7 @@ export default async function LeaderboardPage() {
   const scores = await prisma.playerScore.findMany();
   const scoreMap = new Map<string, Map<string, number>>();
 
-  scores.forEach((score) => {
+  scores.forEach((score: { weekId: string; playerId: string; points: number }) => {
     if (!scoreMap.has(score.weekId)) {
       scoreMap.set(score.weekId, new Map());
     }
