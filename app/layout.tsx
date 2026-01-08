@@ -16,12 +16,6 @@ export const metadata: Metadata = {
   title: "NFL Playoff Fantasy",
   description: "Fantasy football playoff game for 4 managers",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-  },
 };
 
 export default function RootLayout({
