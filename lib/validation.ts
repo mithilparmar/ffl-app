@@ -24,7 +24,15 @@ export async function validateBurnRule(
   const errors: LineupValidationError[] = [];
 
   // Get all lineups from earlier weeks for this user
-  const previousLineups = await prisma.lineup.findMany({
+  type PreviousLineupIds = {
+    qbId: string;
+    rbId: string;
+    wrId: string;
+    teId: string;
+    flexId: string;
+  };
+
+  const previousLineups: PreviousLineupIds[] = await prisma.lineup.findMany({
     where: {
       userId,
       week: {
@@ -33,18 +41,18 @@ export async function validateBurnRule(
         },
       },
     },
-    include: {
-      qb: true,
-      rb: true,
-      wr: true,
-      te: true,
-      flex: true,
+    select: {
+      qbId: true,
+      rbId: true,
+      wrId: true,
+      teId: true,
+      flexId: true,
     },
   });
 
   // Build set of previously used player IDs
   const usedPlayerIds = new Set<string>();
-  previousLineups.forEach((lineup) => {
+  previousLineups.forEach((lineup: PreviousLineupIds) => {
     usedPlayerIds.add(lineup.qbId);
     usedPlayerIds.add(lineup.rbId);
     usedPlayerIds.add(lineup.wrId);
