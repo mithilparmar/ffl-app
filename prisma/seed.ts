@@ -133,32 +133,10 @@ async function main() {
   }
   console.log(`Imported ${importedCount} players from CSV`);
 
-  // Create 3 sample manager users
-  const managerPassword = await bcrypt.hash('manager123', 10);
-  const managers = [
-    { email: 'manager1@ffl.com', name: 'Manager 1' },
-    { email: 'manager2@ffl.com', name: 'Manager 2' },
-    { email: 'manager3@ffl.com', name: 'Manager 3' },
-    { email: 'manager4@ffl.com', name: 'Manager 4' },
-  ];
-
-  for (const manager of managers) {
-    await prisma.user.upsert({
-      where: { email: manager.email },
-      update: {},
-      create: {
-        ...manager,
-        password: managerPassword,
-        isAdmin: false,
-      },
-    });
-  }
-  console.log('Created manager users');
-
   console.log('Database seeded successfully!');
   console.log('\nLogin credentials:');
   console.log(`Admin: ${adminEmail} / (password set via ADMIN_PASSWORD)`);
-  console.log('Managers: manager1@ffl.com through manager4@ffl.com / manager123');
+  console.log('Invite-only signup is enabled; no default managers created.');
 }
 
 main()
