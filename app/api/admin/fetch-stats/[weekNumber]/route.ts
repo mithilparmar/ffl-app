@@ -66,7 +66,10 @@ export async function GET(
     });
 
     if (!week) {
-      return NextResponse.json({ error: 'Week not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Week not found', weekNumber: parseInt(weekNumber) },
+        { status: 404 }
+      );
     }
 
     // Get all unique players from lineups
@@ -90,7 +93,7 @@ export async function GET(
     const sleeperWeek = NFL_WEEK_MAP[parseInt(weekNumber)];
     if (!sleeperWeek) {
       return NextResponse.json(
-        { error: 'Invalid week number' },
+        { error: 'Invalid week number', weekNumber: parseInt(weekNumber), validWeeks: Object.keys(NFL_WEEK_MAP) },
         { status: 400 }
       );
     }
@@ -99,9 +102,24 @@ export async function GET(
     const season = '2024'; // Sleeper uses season year
     const statsUrl = `${SLEEPER_API}/stats/nfl/regular/${season}/${sleeperWeek}`;
     
+    console.log('Fetching from Sleeper API:', statsUrl);
     const response = await fetch(statsUrl);
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch stats from Sleeper API');
+      console.error('Sleeper API error:', response.status, response.statusText);
+      const errorText = await response.text();
+      return NextResponse.json(
+        { 
+          error: 'Failed to fetch stats from Sleeper API',
+          details: {
+            status: response.status,
+            statusText: response.statusText,
+            url: statsUrl,
+            response: errorText
+          }
+        },
+        { status: 500 }
+      );
     }
 
     const allStats: Record<string, SleeperStats> = await response.json();
@@ -133,7 +151,11 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching stats:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch player stats' },
+      { 
+        error: 'Failed to fetch player stats',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
