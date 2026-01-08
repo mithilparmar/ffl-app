@@ -27,6 +27,57 @@ export default async function DashboardPage() {
 
   const locked = isWeekLocked(currentWeek);
 
+  // Get all past weeks (locked weeks before the current week)
+  const pastWeeks = await prisma.week.findMany({
+    where: {
+      number: { lt: currentWeek.number },
+      OR: [
+        { isLocked: true },
+        { deadline: { lt: new Date() } }
+      ]
+    },
+    orderBy: { number: 'desc' },
+  });
+
+  // Get user's lineups and scores for past weeks
+  const pastWeeksData = await Promise.all(
+    pastWeeks.map(async (week) => {
+      const lineup = await prisma.lineup.findUnique({
+        where: {
+          weekId_userId: {
+            weekId: week.id,
+            userId: session.user.id,
+          },
+        },
+        include: {
+          qb: { include: { team: true } },
+          rb: { include: { team: true } },
+          wr: { include: { team: true } },
+          te: { include: { team: true } },
+          flex: { include: { team: true } },
+        },
+      });
+
+      let totalScore = 0;
+      if (lineup) {
+        const playerIds = [lineup.qbId, lineup.rbId, lineup.wrId, lineup.teId, lineup.flexId];
+        const scores = await prisma.playerScore.findMany({
+          where: {
+            weekId: week.id,
+            playerId: { in: playerIds },
+          },
+        });
+        totalScore = scores.reduce((sum, score) => sum + score.points, 0);
+      }
+
+      return {
+        week,
+        lineup,
+        totalScore,
+      };
+    })
+  );
+
   return (
     <div>
       <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Dashboard</h1>
@@ -92,6 +143,78 @@ export default async function DashboardPage() {
           <li><strong className="text-blue-400">Week 4:</strong> 3-2 split (2 teams)</li>
         </ul>
       </div>
+
+      {/* Past Weeks Section */}
+      {pastWeeksData.length > 0 && (
+        <div className="mt-6 sm:mt-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Previous Weeks
+          </h2>
+          <div className="space-y-4">
+            {pastWeeksData.map(({ week, lineup, totalScore }) => (
+              <div
+                key={week.id}
+                className="bg-slate-800 border border-slate-700 shadow-xl rounded-xl p-4 sm:p-6"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-100">
+                      Week {week.number}
+                    </h3>
+                    <p className="text-sm text-slate-300">{week.label}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-slate-400">Your Score</div>
+                    <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                      {totalScore.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                {lineup ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                      <div className="bg-slate-700/50 rounded p-2">
+                        <span className="text-slate-400 text-xs">QB:</span>{' '}
+                        <span className="text-slate-100 font-medium">{lineup.qb.name}</span>
+                        <span className="text-slate-400 text-xs ml-1">({lineup.qb.team.shortCode})</span>
+                      </div>
+                      <div className="bg-slate-700/50 rounded p-2">
+                        <span className="text-slate-400 text-xs">RB:</span>{' '}
+                        <span className="text-slate-100 font-medium">{lineup.rb.name}</span>
+                        <span className="text-slate-400 text-xs ml-1">({lineup.rb.team.shortCode})</span>
+                      </div>
+                      <div className="bg-slate-700/50 rounded p-2">
+                        <span className="text-slate-400 text-xs">WR:</span>{' '}
+                        <span className="text-slate-100 font-medium">{lineup.wr.name}</span>
+                        <span className="text-slate-400 text-xs ml-1">({lineup.wr.team.shortCode})</span>
+                      </div>
+                      <div className="bg-slate-700/50 rounded p-2">
+                        <span className="text-slate-400 text-xs">TE:</span>{' '}
+                        <span className="text-slate-100 font-medium">{lineup.te.name}</span>
+                        <span className="text-slate-400 text-xs ml-1">({lineup.te.team.shortCode})</span>
+                      </div>
+                      <div className="bg-slate-700/50 rounded p-2 sm:col-span-2">
+                        <span className="text-slate-400 text-xs">FLEX:</span>{' '}
+                        <span className="text-slate-100 font-medium">{lineup.flex.name}</span>
+                        <span className="text-slate-400 text-xs ml-1">({lineup.flex.team.shortCode})</span>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/weeks/${week.number}/lineups`}
+                      className="block w-full text-center px-4 py-2 text-sm bg-slate-700 text-slate-200 rounded-lg hover:bg-slate-600 transition-colors mt-3"
+                    >
+                      View All Lineups
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No lineup submitted</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
