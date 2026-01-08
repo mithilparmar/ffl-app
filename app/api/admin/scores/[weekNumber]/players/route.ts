@@ -22,12 +22,20 @@ export async function GET(
     }
 
     // Get all players that appear in lineups for this week
-    const lineups = await prisma.lineup.findMany({
+    type LineupIds = {
+      qbId: string;
+      rbId: string;
+      wrId: string;
+      teId: string;
+      flexId: string;
+    };
+
+    const lineups: LineupIds[] = await prisma.lineup.findMany({
       where: { weekId: week.id },
     });
 
     const playerIds = new Set<string>();
-    lineups.forEach((lineup) => {
+    lineups.forEach((lineup: LineupIds) => {
       playerIds.add(lineup.qbId);
       playerIds.add(lineup.rbId);
       playerIds.add(lineup.wrId);

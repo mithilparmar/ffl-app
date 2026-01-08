@@ -45,8 +45,10 @@ export async function POST(
     }
 
     const { weekNumber } = await params;
+    type ScoreInput = { playerId: string; points: number };
+
     const body = await request.json();
-    const { scores } = body;
+    const scores = (body?.scores ?? []) as ScoreInput[];
 
     const week = await prisma.week.findUnique({
       where: { number: parseInt(weekNumber) },
