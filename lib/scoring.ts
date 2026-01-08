@@ -79,7 +79,7 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   // PASSING
   const passYards = getPassYards();
   if (passYards) {
-    score += Math.floor(passYards / 25); // 1pt per 25 yards
+    score += passYards / 25; // 1pt per 25 yards (fractional)
     
     // Passing yardage bonuses
     if (passYards >= 400) {
@@ -116,7 +116,7 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   // RUSHING
   const rushYards = getRushYards();
   if (rushYards) {
-    score += Math.floor(rushYards / 10); // 1pt per 10 yards
+    score += rushYards / 10; // 1pt per 10 yards (fractional)
     
     // Rushing yardage bonuses
     if (rushYards >= 200) {
@@ -148,7 +148,7 @@ export function calculatePlayerScore(stats: PlayerStats): number {
   
   const recYards = getRecYards();
   if (recYards) {
-    score += Math.floor(recYards / 10); // 1pt per 10 yards
+    score += recYards / 10; // 1pt per 10 yards (fractional)
     
     // Receiving yardage bonuses
     if (recYards >= 200) {

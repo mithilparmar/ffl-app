@@ -73,7 +73,7 @@ export async function fetchESPNStats(
       return {
         passingYards: 255,
         passingTouchdowns: 3,
-        interceptions: 2,
+        interceptions: 0,
         sacks: 2,
         rushingYards: 11,
         rushingTouchdowns: 0,
