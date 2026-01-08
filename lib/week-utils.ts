@@ -7,14 +7,19 @@ export async function getCurrentWeek() {
     orderBy: { number: 'asc' },
   });
 
-  // Find the first week that either has no deadline or deadline hasn't passed
+  // Find the first week that is not locked and deadline hasn't passed
   for (const week of weeks) {
-    if (!week.deadline || now < week.deadline) {
-      return week;
-    }
+    // Skip if manually locked
+    if (week.isLocked) continue;
+    
+    // Skip if deadline has passed
+    if (week.deadline && now >= week.deadline) continue;
+    
+    // This week is open
+    return week;
   }
 
-  // If all deadlines have passed, return the last week
+  // If all weeks are locked, return the last week
   return weeks[weeks.length - 1] || null;
 }
 
