@@ -65,6 +65,11 @@ export default async function WeekLineupsPage({
     flex: { name: string; team: { shortCode: string } };
   };
 
+  type ScoreRecord = {
+    playerId: string;
+    points: number;
+  };
+
   const lineups: LineupWithPlayers[] = await prisma.lineup.findMany({
     where: {
       weekId: week.id,
@@ -89,7 +94,7 @@ export default async function WeekLineupsPage({
     playerIds.add(lineup.flexId);
   });
 
-  const scores = await prisma.playerScore.findMany({
+  const scores: ScoreRecord[] = await prisma.playerScore.findMany({
     where: {
       weekId: week.id,
       playerId: {
@@ -98,7 +103,7 @@ export default async function WeekLineupsPage({
     },
   });
 
-  const scoreMap = new Map(scores.map((s) => [s.playerId, s.points]));
+  const scoreMap = new Map(scores.map((s: ScoreRecord) => [s.playerId, s.points]));
 
   // Calculate lineup scores
   const lineupsWithScores = lineups.map((lineup: LineupWithPlayers) => {
