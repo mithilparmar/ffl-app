@@ -41,6 +41,12 @@ export default function Navigation({ user }: NavigationProps) {
                 Dashboard
               </Link>
               <Link
+                href="/weeks"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/weeks')}`}
+              >
+                Weeks
+              </Link>
+              <Link
                 href="/leaderboard"
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive('/leaderboard')}`}
               >
@@ -117,6 +123,13 @@ export default function Navigation({ user }: NavigationProps) {
               className={`block px-3 py-2 rounded-md text-sm font-medium ${isActive('/dashboard')}`}
             >
               Dashboard
+            </Link>
+            <Link
+              href="/weeks"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`block px-3 py-2 rounded-md text-sm font-medium ${isActive('/weeks')}`}
+            >
+              Weeks
             </Link>
             <Link
               href="/leaderboard"
