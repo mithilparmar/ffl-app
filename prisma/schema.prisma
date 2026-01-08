@@ -46,7 +46,6 @@ model Player {
   name         String
   position     Position
   teamId       String
-  sleeperId    String?       @unique // Sleeper API player ID
   team         NflTeam       @relation(fields: [teamId], references: [id], onDelete: Cascade)
   qbLineups    Lineup[]      @relation("QBLineup")
   rbLineups    Lineup[]      @relation("RBLineup")

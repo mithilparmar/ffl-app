@@ -1,151 +1,107 @@
-// Scoring calculation based on NFL stats
 export interface PlayerStats {
   // Passing
-  pass_yd?: number;
-  pass_td?: number;
-  pass_int?: number;
-  pass_sack?: number;
+  pass_yd?: number; // Passing yards
+  pass_td?: number; // Passing touchdowns
+  pass_int?: number; // Interceptions thrown
+  pass_sack?: number; // Times sacked
   pass_td_40p?: number; // 40+ yard passing TDs
   pass_td_50p?: number; // 50+ yard passing TDs
-  
+
   // Rushing
-  rush_yd?: number;
-  rush_td?: number;
+  rush_yd?: number; // Rushing yards
+  rush_td?: number; // Rushing touchdowns
   rush_td_40p?: number; // 40+ yard rushing TDs
   rush_td_50p?: number; // 50+ yard rushing TDs
-  
+
   // Receiving
-  rec_yd?: number;
-  rec_td?: number;
+  rec_yd?: number; // Receiving yards
+  rec_td?: number; // Receiving touchdowns
   rec?: number; // Receptions
   rec_td_40p?: number; // 40+ yard receiving TDs
   rec_td_50p?: number; // 50+ yard receiving TDs
-  
+
   // Misc
   fum?: number; // Fumbles
   fum_lost?: number; // Fumbles lost
-  fum_rec_td?: number; // Fumble recovery TDs
-  pass_2pt?: number; // Passing 2pt conversions
-  rec_2pt?: number; // Receiving 2pt conversions
-  rush_2pt?: number; // Rushing 2pt conversions
+  fum_rec_td?: number; // Fumble recovered for TD
+  pass_2pt?: number; // Passing 2pt conversions (for QB)
+  rec_2pt?: number; // Receiving 2pt conversions (for receiver)
+  rush_2pt?: number; // Rushing 2pt conversions (for rusher)
 }
 
 export function calculatePlayerScore(stats: PlayerStats): number {
   let score = 0;
 
+  const n = (v?: number) => (typeof v === 'number' ? v : 0);
+
   // PASSING
-  if (stats.pass_yd) {
-    score += stats.pass_yd / 25; // 1pt per 25 yards (fractional)
-    
-    // Passing yardage bonuses
-    if (stats.pass_yd >= 400) {
-      score += 4;
-    } else if (stats.pass_yd >= 300) {
-      score += 2;
-    }
+  const passYds = n(stats.pass_yd);
+  const passTd = n(stats.pass_td);
+  const passInt = n(stats.pass_int);
+  const passSack = n(stats.pass_sack);
+  const passTd40 = n(stats.pass_td_40p);
+  const passTd50 = n(stats.pass_td_50p);
+
+  if (passYds > 0) {
+    score += passYds / 25; // 1pt per 25 yards (fractional)
+    // Yardage bonus
+    if (passYds >= 400) score += 4;
+    else if (passYds >= 300) score += 2;
   }
-  
-  if (stats.pass_td) {
-    score += stats.pass_td * 4; // 4pts per passing TD
-  }
-  
-  if (stats.pass_int) {
-    score -= stats.pass_int * 2; // -2pts per interception
-  }
-  
-  if (stats.pass_sack) {
-    score -= stats.pass_sack * 0.5; // -0.5pts per sack
-  }
-  
-  // Passing TD distance bonuses
-  if (stats.pass_td_50p) {
-    score += stats.pass_td_50p * 2; // 2pt bonus for 50+ yard TD
-  }
-  if (stats.pass_td_40p) {
-    // 40+ includes 50+, so subtract 50+ to avoid double counting
-    const fortyPlus = stats.pass_td_40p - (stats.pass_td_50p || 0);
-    score += fortyPlus * 1; // 1pt bonus for 40-49 yard TD
-  }
+  score += passTd * 4; // Passing TDs
+  score -= passInt * 2; // Interceptions
+  score -= passSack * 0.5; // Sacks
+  score += passTd40 * 1; // 40+ yd passing TD bonus
+  score += passTd50 * 2; // 50+ yd passing TD bonus
 
   // RUSHING
-  if (stats.rush_yd) {
-    score += stats.rush_yd / 10; // 1pt per 10 yards (fractional)
-    
-    // Rushing yardage bonuses
-    if (stats.rush_yd >= 200) {
-      score += 2;
-    } else if (stats.rush_yd >= 100) {
-      score += 1;
-    }
+  const rushYds = n(stats.rush_yd);
+  const rushTd = n(stats.rush_td);
+  const rushTd40 = n(stats.rush_td_40p);
+  const rushTd50 = n(stats.rush_td_50p);
+
+  if (rushYds > 0) {
+    score += rushYds / 10; // 1pt per 10 yards (fractional)
+    // Yardage bonus
+    if (rushYds >= 200) score += 2;
+    else if (rushYds >= 100) score += 1;
   }
-  
-  if (stats.rush_td) {
-    score += stats.rush_td * 6; // 6pts per rushing TD
-  }
-  
-  // Rushing TD distance bonuses
-  if (stats.rush_td_50p) {
-    score += stats.rush_td_50p * 2; // 2pt bonus for 50+ yard TD
-  }
-  if (stats.rush_td_40p) {
-    const fortyPlus = stats.rush_td_40p - (stats.rush_td_50p || 0);
-    score += fortyPlus * 1; // 1pt bonus for 40-49 yard TD
-  }
+  score += rushTd * 6; // Rushing TDs
+  score += rushTd40 * 1; // 40+ yd rushing TD bonus
+  score += rushTd50 * 2; // 50+ yd rushing TD bonus
 
   // RECEIVING
-  if (stats.rec) {
-    score += stats.rec * 0.5; // 0.5pts per reception
+  const recYds = n(stats.rec_yd);
+  const recTd = n(stats.rec_td);
+  const rec = n(stats.rec);
+  const recTd40 = n(stats.rec_td_40p);
+  const recTd50 = n(stats.rec_td_50p);
+
+  if (recYds > 0) {
+    score += recYds / 10; // 1pt per 10 yards (fractional)
+    // Yardage bonus
+    if (recYds >= 200) score += 2;
+    else if (recYds >= 100) score += 1;
   }
-  
-  if (stats.rec_yd) {
-    score += stats.rec_yd / 10; // 1pt per 10 yards (fractional)
-    
-    // Receiving yardage bonuses
-    if (stats.rec_yd >= 200) {
-      score += 2;
-    } else if (stats.rec_yd >= 100) {
-      score += 1;
-    }
-  }
-  
-  if (stats.rec_td) {
-    score += stats.rec_td * 6; // 6pts per receiving TD
-  }
-  
-  // Receiving TD distance bonuses
-  if (stats.rec_td_50p) {
-    score += stats.rec_td_50p * 2; // 2pt bonus for 50+ yard TD
-  }
-  if (stats.rec_td_40p) {
-    const fortyPlus = stats.rec_td_40p - (stats.rec_td_50p || 0);
-    score += fortyPlus * 1; // 1pt bonus for 40-49 yard TD
-  }
+  score += recTd * 6; // Receiving TDs
+  score += rec * 0.5; // Receptions
+  score += recTd40 * 1; // 40+ yd receiving TD bonus
+  score += recTd50 * 2; // 50+ yd receiving TD bonus
 
   // MISC
-  if (stats.fum) {
-    score -= stats.fum; // -1pt per fumble
-  }
-  
-  if (stats.fum_lost) {
-    score -= stats.fum_lost; // -1pt per fumble lost
-  }
-  
-  if (stats.fum_rec_td) {
-    score += stats.fum_rec_td * 6; // 6pts for fumble recovery TD
-  }
-  
-  // 2-point conversions
-  if (stats.pass_2pt) {
-    score += stats.pass_2pt * 2; // 2pts for passing 2pt conversion
-  }
-  
-  if (stats.rec_2pt) {
-    score += stats.rec_2pt * 2; // 2pts for receiving 2pt conversion
-  }
-  
-  if (stats.rush_2pt) {
-    score += stats.rush_2pt * 2; // 2pts for rushing 2pt conversion
-  }
+  const fum = n(stats.fum);
+  const fumLost = n(stats.fum_lost);
+  const fumRecTd = n(stats.fum_rec_td);
+  const pass2pt = n(stats.pass_2pt);
+  const rec2pt = n(stats.rec_2pt);
+  const rush2pt = n(stats.rush_2pt);
 
-  return Math.round(score * 100) / 100; // Round to 2 decimal places
+  score -= fum * 1; // Fumbles
+  score -= fumLost * 1; // Fumbles lost
+  score += fumRecTd * 6; // Fumble recovered for TD
+  score += pass2pt * 2; // 2pt conversion (QB on pass)
+  score += rec2pt * 2; // 2pt conversion (receiver on pass)
+  score += rush2pt * 2; // 2pt conversion (rusher on run)
+
+  return Number(score.toFixed(2));
 }
